@@ -7,6 +7,7 @@ import Signup from './Signup.jsx';
 import Search from './Search.jsx';
 import BusinessList from './BusinessList.jsx';
 import BusinessPage from './BusinessPage.jsx';
+import Profile from './Profile.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -18,8 +19,10 @@ class App extends React.Component {
       userID: 0,
       loggedIn: false,
       checkedIn: false,
-      favorites: {}
+      favorites: {},
+      createUserStatus: 'createUserStatus test!',
     }
+    this.location = 'location=37.7749,-122.4194',
     this.photos = [];
     this.searchResults = {};
   }
@@ -36,7 +39,10 @@ class App extends React.Component {
         this.loginUser(loginData);
       })
       .catch(err => {
-        console.log(err);
+        console.log(err.response);
+        let { createUserStatus } = this.state;
+        createUserStatus = err.response.data;
+        this.setState({ createUserStatus })
       });
   }
 
@@ -50,6 +56,7 @@ class App extends React.Component {
             userId: resp.data[0].id,
             username: resp.data[0].username,
             password: resp.data[0].password,
+            email: resp.data[0].email,
             userID: resp.data[0].id,
             loggedIn: true,
           });
@@ -70,9 +77,8 @@ class App extends React.Component {
 
   getBusinesses(search) {
     let self = this;
-    axios.get(`/server/search/${search}`)
+    axios.get(`/server/search/${search}/${this.location}`)
       .then(resp => {
-        console.log(resp);
         self.searchResults = resp;
         self.props.history.push('/listings');
       })
@@ -167,12 +173,28 @@ class App extends React.Component {
     this.props.history.push('/listings');
   }
 
+  getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        this.location = `location=${latitude},${longitude}`;
+      });
+    }
+  }
+
+  componentDidMount() {
+    this.getLocation();
+  }
+
   render() {
     return (
       <div>
         <div id="topnav">
           {this.state.loggedIn ?
-            <div>
+            <div onClick={e => {
+              document.body.style.background = "url('beer.jpg')";
+              document.body.style.backgroundSize = "100%";
+            }}>
               <Link to="/search" className="logoLink">
                 <img className="logo"src="https://image.ibb.co/cRbaE6/imageedit_16_4158574454.png"/>
                 YALP!
@@ -194,7 +216,7 @@ class App extends React.Component {
           <Route exact path="/" render={ () => <div id="form-background"><div id="form"><Home /></div></div> }/>
           <Route path="/search" render={ () => <div id="form-background"><div id="form"><Search getBusinesses={this.getBusinesses.bind(this)}/></div></div> }/>
           <Route path="/login" render={ () => <div id="form-background"><div id="form"><Login loginUser={this.loginUser.bind(this)}/></div></div> }/>
-          <Route path="/signup" render={ () => <div id="form-background"><div id="form"><Signup createUser={this.createUser.bind(this)}/></div></div> }/>
+          <Route path="/signup" render={ () => <div id="form-background"><div id="form"><Signup createUser={this.createUser.bind(this)} createUserStatus={this.state.createUserStatus}/></div></div> }/>
           <Route path="/listings" render={ 
             () => <div id="listings"><BusinessList 
               businesses={this.searchResults} 
@@ -216,6 +238,7 @@ class App extends React.Component {
               /> 
             }
           />
+          <Route path="/profile" render={ () => <div><Profile profileId={this.state.userID} /></div>}/>
         </Switch>
     </div>
     )
