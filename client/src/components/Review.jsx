@@ -12,7 +12,7 @@ class Review extends React.Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.checkIfFriend();
     this.getUsernameOfReview();
   }
