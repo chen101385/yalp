@@ -19,9 +19,9 @@
 1. [Team](#team)
 1. [Contributing](#contributing)
 
-## Usage
+## Demo
 
-> Some usage instructions
+Try it here: [Yalp] (http://yalp.herokuapp.com/)
 
 ## Requirements
 
