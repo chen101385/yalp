@@ -21,7 +21,7 @@
 
 ## Demo
 
-Try it here: [Yalp] (http://yalp.herokuapp.com/)
+Try it here [Yalp] (http://yalp.herokuapp.com/)
 
 ## Requirements
 
